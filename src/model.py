@@ -37,7 +37,7 @@ def train_model(trading_pair, lookback, model_name, model_params={}):
         datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
     )
     model_hash = hashing.hash(model_metadata)
-    model_path = f'./model/kerasmodels/{model_hash}.hdf5'
+    model_path = f'./models/{model_hash}.hdf5'
     model.fit(
         data['x_train'], data['y_train'],
         shuffle=True,
