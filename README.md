@@ -1,5 +1,7 @@
 cryptolabeller
 
+Assumes you have a mongodb running with OHLC data.
+
 Entrypoint src/main.py
 Tensorboard logging outputted at src/logs/finance
 
