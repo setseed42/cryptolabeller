@@ -132,3 +132,12 @@ def lstm_arch(n_features, lookback, n_labels=3, hidden_size=64, depth=0):
         ]
     )
     return model
+
+def get_hidden_output(model_path):
+    model = keras.models.load_model(model_path)
+    layer_name = 'last_hidden'
+    intermediate_layer_model = keras.models.Model(
+        inputs=model.input,
+        outputs=model.get_layer(layer_name).output
+    )
+    return intermediate_layer_model

@@ -22,7 +22,7 @@ def get_trading_pair_data(trading_pair):
 @checkpoint
 def handle_trading_pair(trading_pair):
     print(f'Doing {trading_pair}')
-    df = get_trading_pair_data(trading_pair).head(1000)
+    df = get_trading_pair_data(trading_pair)
     trading_pair_info = get_trading_pair_info()[trading_pair]
     return preprocessing_pipeline(df, trading_pair_info)
 
