@@ -5,6 +5,8 @@ from preprocessors import get_x_features
 from imblearn.under_sampling import RandomUnderSampler
 from pprint import pprint
 from collections import Counter
+from import_data import binance_db, get_trading_pair_info, handle_trading_pair
+from relib import f
 
 @checkpoint(format='bcolz')
 def split_shard_dataset(df, lookback=1):
@@ -82,4 +84,55 @@ def get_class_dist(y):
         in dict(counts).items()
     }
 
+
+@checkpoint
+def get_all_data(lookback):
+    trading_pairs = sorted([
+        collection['name']
+        for collection in
+        binance_db.list_collections()
+    ])[:100]
+    trading_pair_info = get_trading_pair_info()
+    all_assets = sorted(set(f.flatten([
+        [v['quote_asset'], v['base_asset']]
+        for (k, v) in trading_pair_info.items()
+        if k in trading_pairs
+    ])))
+    asset_map = {
+        asset: i
+        for i, asset
+        in enumerate(all_assets)
+    }
+
+
+    def process_trading_pair(trading_pair):
+        data = handle_trading_pair(trading_pair)
+        data = split_shard_dataset(data, lookback)
+        def get_encoded_asset(trading_pair, which):
+            asset = trading_pair_info[trading_pair][which]
+            return asset_map[asset]
+
+        def get_asset_features(trading_pair, which):
+            splits = ['train', 'val', 'test']
+            return {
+                f'{which}_{split}': np.repeat(
+                    get_encoded_asset(trading_pair, which),
+                    len(data[f'x_{split}'])
+                )
+                for split in splits
+            }
+        return {
+            **get_asset_features(trading_pair, 'quote_asset'),
+            **get_asset_features(trading_pair, 'base_asset'),
+            **data
+        }
+
+    all_data = [
+        process_trading_pair(trading_pair)
+        for trading_pair in trading_pairs
+    ]
+    return {
+        key: np.concatenate([a[key] for a in all_data])
+        for key in all_data[0]
+    }, asset_map
 

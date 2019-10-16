@@ -1,17 +1,18 @@
 import numpy as np
 from pandas_flavor import register_dataframe_method as rdm
 import pandas as pd
-from datetime import datetime
+from datetime import datetime, timedelta
 from tqdm import tqdm
 from sklearn.preprocessing import StandardScaler
 
 def preprocessing_pipeline(df, trading_pair_info):
     return df \
         .initial_preprocess() \
+        .add_dt_index() \
+        .filter_to_recent() \
         .add_tp_data(trading_pair_info) \
         .reduce_mem_usage() \
         .filter_features() \
-        .add_dt_index() \
         .label_data() \
         .split_preprocess_df() \
         .reduce_mem_usage()
@@ -35,6 +36,25 @@ def initial_preprocess(df):
 def add_tp_data(df, trading_pair_info):
     for key in trading_pair_info:
         df[key] = trading_pair_info[key]
+    return df
+
+
+@rdm
+def add_dt_index(df):
+    dt_func = lambda x: datetime.fromtimestamp(x/1000)
+    df.index = df['closetime'].apply(dt_func)
+    return df
+
+
+@rdm
+def filter_to_recent(df):
+    today = datetime.now()
+    print(len(df))
+    df = df[
+        (today - timedelta(days=32) < df.index) &
+        (df.index < today - timedelta(days=2))
+    ]
+    print(len(df))
     return df
 
 
@@ -120,11 +140,6 @@ def filter_features(df):
     return df[['closetime', *ts_features]]
 
 
-@rdm
-def add_dt_index(df):
-    dt_func = lambda x: datetime.fromtimestamp(x/1000)
-    df.index = df['closetime'].apply(dt_func)
-    return df
 
 #https://towardsdatascience.com/financial-machine-learning-part-1-labels-7eeed050f32e
 @rdm
