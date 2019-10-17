@@ -23,16 +23,15 @@ def train_model(params):
     )
     model.summary()
     model_metadata = '-'.join([
-            str(value)
-            for value
-            in params.values()
+            f'{key}-{str(np.round(value,3))}'
+            for key, value
+            in sorted(params.items())
     ])
+    model_hash = hashing.hash(model_metadata)
     log_dir = "logs/finance/{}-{}".format(
-        model_metadata,
+        model_hash,
         datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
     )
-    tensorboard_callback = keras.callbacks.TensorBoard(log_dir=log_dir)
-    model_hash = hashing.hash(model_metadata)
     model_path = f'./models/{model_hash}.hdf5'
     def get_x(split):
         return data[f'x_{split}'], data[f'quote_asset_{split}'], data[f'base_asset_{split}']
@@ -60,7 +59,8 @@ def train_model(params):
                 save_best_only=True,
                 filepath=model_path
             ),
-            tensorboard_callback
+            keras.callbacks.TensorBoard(log_dir=log_dir),
+            hp.KerasCallback(log_dir, params)
         ]
     )
     keras.backend.clear_session()
