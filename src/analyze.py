@@ -2,16 +2,13 @@ import streamlit as st
 from relib import hashing
 import json
 from tensorflow import keras
-from modelify_dataset import get_all_data
 from checkpointer import checkpoint
 from sklearn.decomposition import PCA
 import altair as alt
 import pandas as pd
 import numpy as np
-from import_data import handle_trading_pair
-from preprocessors import get_x_features
 import matplotlib.pyplot as plt
-
+import pickle
 
 def get_models():
     with open('./param_map.json') as f:
@@ -41,21 +38,13 @@ def predict_sub_model(model_hash, layer_name, data):
 
 @checkpoint
 def get_val_data(lookback):
-    data, asset_map = get_all_data(lookback)
-    ixs = np.random.choice(len(data['x_val']), 1000, replace=False)
-    data = {
-        key: value[ixs]
-        for key, value
-        in data.items()
-        if 'val' in key
-    }
-
-    return data, asset_map
+    with open(f'./data/{lookback}.pkl', 'rb') as f:
+        return pickle.load(f)
 
 @checkpoint
 def get_x_cols():
-    data = handle_trading_pair('ADABNB')
-    return get_x_features(data)
+    with open(f'./data/x_cols.pkl', 'rb') as f:
+        return pickle.load(f)
 
 def decompose_embeds(embeds):
     return PCA(n_components=2, random_state=42, whiten=True).fit_transform(embeds)
@@ -92,7 +81,7 @@ def get_transformed_params(model_hash):
 
 @checkpoint
 def get_plot_data(lookback, model_hash, layer_name):
-    data, asset_map = get_val_data(params['lookback'])
+    data = get_val_data(params['lookback'])
     embeds = predict_sub_model(model_hash, layer_name, data)
     preds = predict_model(model_hash, data)
     pca_embeds = decompose_embeds(embeds)
@@ -115,6 +104,8 @@ def predict_model(model_hash, data):
     ), verbose=1)
 
 if __name__ == "__main__":
+    for lookback in [15, 30, 90, 120]:
+        get_val_data(lookback)
     models = get_models()
     model_hash = st.selectbox(
         'Select model:',
@@ -131,7 +122,7 @@ if __name__ == "__main__":
     )
     st.write(layer_name)
     pca_data = get_plot_data(params['lookback'], model_hash, layer_name)
-    data, asset_map = get_val_data(params['lookback'])
+    data = get_val_data(params['lookback'])
     x_cols = get_x_cols()
     for c in pca_data['class'].unique():
 
