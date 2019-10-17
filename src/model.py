@@ -113,55 +113,6 @@ def model_arch(params, n_features, lookback, n_assets, n_labels=3):
     )
     return model
 
-# def mlp_arch(hidden_size=64, depth=1, dropout_p=0.5):
-#     def hidden(input_layer):
-#         x = keras.layers.Flatten()(input_layer)
-#         for i in range(depth):
-#             if i == depth-1:
-#                 x = keras.layers.Dense(
-#                     hidden_size,
-#                     activation='relu',
-#                     name='last_hidden',
-#                     kernel_regularizer=keras.regularizers.l2(0.001)
-#                 )(x)
-#             else:
-#                 x = keras.layers.Dense(
-#                     hidden_size,
-#                     activation='relu',
-#                     kernel_regularizer=keras.regularizers.l2(0.001)
-#                 )(x)
-#             x = keras.layers.Dropout(dropout_p)(x)
-#         return x
-#     return hidden
-
-# def lstm_arch(params):
-#     def hidden(input_layer):
-#         x = input_layer
-#         for i in range(params['lstm_depth']):
-#             x = keras.layers.LSTM(
-#                 2**params['lstm_hidden_size'],
-#                 return_sequences=True,
-#                 name=f'lstm_hidden_{i}'
-#                 kernel_regularizer=keras.regularizers.l2(10**(-1 * params['lstm_reg_power']))
-#             )(x)
-#             x = keras.layers.Dropout(params['lstm_dropout_p'])(x)
-#         x = keras.layers.LSTM(
-#             2**params['lstm_last_hidden_size'],
-#             name='lstm_last_hidden',
-#             kernel_regularizer=keras.regularizers.l2(10**(-1 * params['lstm_last_reg_power']))
-#         )(x)
-#         x = keras.layers.Dropout(params['lstm_last_dropout_p'])(x)
-#         for i in range(params['dense_depth']):
-#             x = keras.layers.Dense(
-#                     **params[f'dense_hidden_size'],
-#                     activation='relu',
-#                     name=f'dense_hidden_{i}',
-#                     kernel_regularizer=keras.regularizers.l2(10**(-1 * params['dense_reg_power'])
-#                 )(x)
-#             x = keras.layers.Dropout(params['dense_dropout_p'])(x)
-#         return x
-#     return hidden
-
 def get_input_layers(n_features, lookback):
     input_layer = keras.layers.Input(shape=(lookback, n_features,), name='ts_input')
     quote_input = keras.layers.Input(shape=(1, ), name='quote_input')
