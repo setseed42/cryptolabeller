@@ -9,7 +9,11 @@ from itertools import product
 from import_data import handle_trading_pair
 from modelify_dataset import get_all_data
 from tensorboard.plugins.hparams import api as hp
+import os
+import json
+from checkpointer import checkpoint
 
+@checkpoint
 def train_model(params):
     data, asset_map = get_all_data(15 * (2**params['lookback']))
     for split in ['train', 'test', 'val']:
@@ -28,6 +32,15 @@ def train_model(params):
             in sorted(params.items())
     ])
     model_hash = hashing.hash(model_metadata)
+
+    if os.path.exists('./param_map.json'):
+        with open('./param_map.json') as f:
+            param_map = json.load(f)
+    else:
+        param_map = {}
+    param_map[model_hash] = params
+    with open('./param_map.json', 'w') as f:
+        json.dump(param_map, f)
     log_dir = "logs/finance/{}-{}".format(
         model_hash,
         datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
