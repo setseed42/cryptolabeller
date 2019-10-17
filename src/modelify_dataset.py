@@ -17,11 +17,7 @@ def split_shard_dataset(df, lookback=1):
             df[df['split'] == which]['label'].values,
             lookback, is_y=True
         )
-        y = y.reshape(-1).astype(int) + 1
-        y_new = np.zeros((len(y), 3))
-        for (i, j) in enumerate(y):
-            y_new[i, j] = 1
-        return y_new
+        return y.reshape(-1).astype(int) + 1
 
     model_x = shard_data(df[df['split'] == 'train'][x_features].values, lookback)
     model_y = handle_y('train')
@@ -65,7 +61,7 @@ def under_sample(x, y):
     under_sampler = RandomUnderSampler(random_state=42, return_indices=True)
     under_sampler.fit_resample(
         np.concatenate([i[-1:] for i in x]),
-        np.argmax(y, axis=1),
+        y,
     )
     indexes = under_sampler.sample_indices_
     n = len(x)
@@ -77,7 +73,7 @@ def under_sample(x, y):
 
 
 def get_class_dist(y):
-    counts = Counter(np.argmax(y, axis=1))
+    counts = Counter(y)
     return {
         key: value/len(y)
         for key, value

@@ -8,9 +8,13 @@ from imblearn.under_sampling import RandomUnderSampler
 from itertools import product
 from import_data import handle_trading_pair
 from modelify_dataset import get_all_data
+from tensorboard.plugins.hparams import api as hp
 
 def train_model(params):
     data, asset_map = get_all_data(15 * (2**params['lookback']))
+    for split in ['train', 'test', 'val']:
+        y_key = f'y_{split}'
+        data[y_key] = keras.utils.to_categorical(data[y_key], num_classes=3).astype(int)
     model = model_arch(
         params,
         data['x_train'].shape[2],
