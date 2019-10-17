@@ -87,12 +87,14 @@ def get_class_dist(y):
 
 @checkpoint
 def get_all_data(lookback):
+    trading_pair_info = get_trading_pair_info()
     trading_pairs = sorted([
         collection['name']
         for collection in
         binance_db.list_collections()
+        for collection['name']
+        in trading_pair_info.keys()
     ])[:100]
-    trading_pair_info = get_trading_pair_info()
     all_assets = sorted(set(f.flatten([
         [v['quote_asset'], v['base_asset']]
         for (k, v) in trading_pair_info.items()

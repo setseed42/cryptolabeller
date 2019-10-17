@@ -36,6 +36,7 @@ def get_trading_pair_info():
             'quote_asset': symbol['quoteAsset'],
         }
         for symbol in symbols
+        if symbol['status'] == 'TRADING'
     }
 
 
@@ -45,7 +46,4 @@ if __name__ == "__main__":
         for collection in
         binance_db.list_collections()
     ])
-    trading_pair = 'BATETH'
-    print(f'Doing {trading_pair}')
-    df = handle_trading_pair(trading_pair)
-    print(df.columns)
+    get_trading_pair_info()
