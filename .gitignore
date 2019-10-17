@@ -123,6 +123,6 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
-src/logs
-src/models
+# src/logs
+# src/models
 .vscode
