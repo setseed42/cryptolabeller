@@ -27,5 +27,21 @@ if __name__ == "__main__":
             .map(lambda x: None) \
             .compute()
 
-    search_space = arch_search_space()
-    get_best_params(search_space)
+    # search_space = arch_search_space()
+    # get_best_params(search_space)
+    train_model({
+        "dense_depth":1,
+        "dense_dropout_p":0.383395377969626,
+        "dense_hidden_size":9,
+        "dense_reg_power":4,
+        "embedding_size":5,
+        "lookback":3,
+        "lstm_depth":1,
+        "lstm_dropout_p":0.06915426913928757,
+        "lstm_hidden_size":4,
+        "lstm_last_dropout_p":0.43206395773247525,
+        "lstm_last_hidden_size":9,
+        "lstm_last_reg_power":3,
+        "lstm_reg_power":5,
+        "output_reg_power":5,
+    })

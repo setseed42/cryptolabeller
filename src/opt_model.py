@@ -47,9 +47,9 @@ def perform_optimization(search_space):
 
 def arch_search_space():
     return {
-        'lstm_hidden_size': hp.quniform('lstm_hidden_size', 4, 9, 1),
-        'lstm_last_hidden_size': hp.quniform('lstm_last_hidden_size', 4, 9, 1),
-        'dense_hidden_size': hp.quniform('dense_hidden_size', 4, 9, 1),
+        'lstm_hidden_size': hp.quniform('lstm_hidden_size', 4, 6, 1),
+        'lstm_last_hidden_size': hp.quniform('lstm_last_hidden_size', 4, 6, 1),
+        'dense_hidden_size': hp.quniform('dense_hidden_size', 4, 6, 1),
         'lookback': hp.quniform('lookback', 0, 4, 1),
         'lstm_dropout_p': hp.uniform('lstm_dropout_p', 0.0, 0.5),
         'lstm_last_dropout_p': hp.uniform('lstm_last_dropout_p', 0.0, 0.5),
