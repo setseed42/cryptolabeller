@@ -1,10 +1,24 @@
-cryptolabeller
+# cryptolabeller
 
-Assumes you have a mongodb running with OHLC data.
+Prerequisites:
+- [pipenv](https://pipenv.pypa.io/en/latest/)
+- Assumes you have a mongodb running with OHLC data.
 
-Entrypoint src/main.py
-Tensorboard logging outputted at src/logs/finance
+Entrypoint for training/preprocessing `src/main.py`
+Tensorboard logging outputted at `src/logs/finance`
 
-Linux requirements:
-conda env create -f environment.yml
-Manually install tensorflow=2.0.0 and ta-lib==0.4.17.
+Validation data has been persisted to the repo to analyze results:
+
+To install python environment
+```bash
+pipenv install
+```
+Activate the pipenv environment
+```bash
+pipenv shell
+```
+To run streamlit app
+```bash
+cd src
+streamlit run analyze.py
+```
